@@ -1,0 +1,2551 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ABC Phonics Adventure</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Arial Rounded MT Bold", Arial, sans-serif;
+    background: linear-gradient(
+        135deg,#e3f5ff,#fff1d9,#f4e6ff
+    );
+    color: #34415d;
+}
+
+header {
+    text-align: center;
+    padding: 25px 15px 18px;
+}
+
+h1 {
+    margin: 0 0 12px;
+    font-size: clamp(28px,5vw,46px);
+    color: #6655b5;
+}
+
+h2 {
+    margin: 14px 0;
+}
+
+.subtitle {
+    color: #68738b;
+    line-height: 1.7;
+}
+
+.container {
+    max-width: 1120px;
+    margin: auto;
+    padding: 15px;
+}
+
+button {
+    border: 0;
+    border-radius: 16px;
+    padding: 14px 20px;
+    font-family: inherit;
+    font-weight: bold;
+    font-size: 17px;
+    color: #34415d;
+    cursor: pointer;
+    transition: .2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: scale(.96);
+}
+
+button:focus-visible {
+    outline: 3px solid #6555bd;
+    outline-offset: 3px;
+}
+
+.alphabet {
+    display: grid;
+    grid-template-columns: repeat(13,1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.letter-button {
+    background: white;
+    font-size: 25px;
+    padding: 12px 3px;
+    box-shadow: 0 3px 0 #d8dceb;
+}
+
+.letter-button.selected {
+    background: #7770cb;
+    color: white;
+}
+
+.letter-button.done {
+    border-bottom: 5px solid #47ba87;
+}
+
+.progress-track {
+    height: 14px;
+    background: #e0e2ee;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 10px 0 20px;
+}
+
+#progressBar {
+    height: 100%;
+    background: #54c99a;
+    width: 0;
+    transition: width .3s;
+}
+
+.panel {
+    background: white;
+    text-align: center;
+    border-radius: 28px;
+    padding: 26px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 25px #48577c13;
+}
+
+.step-label {
+    display: inline-block;
+    padding: 9px 20px;
+    border-radius: 30px;
+    background: #eeeaff;
+    color: #6a5bb6;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.main-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.picture-box {
+    background: #fff5dd;
+    border-radius: 25px;
+    margin: 18px auto;
+    max-width: 380px;
+    padding: 12px;
+}
+
+#associationPicture svg {
+    width: 100%;
+    max-height: 250px;
+}
+
+#letterTitle {
+    color: #6659bb;
+    font-size: 76px;
+    font-weight: bold;
+}
+
+#associationText {
+    color: #dd8052;
+    font-size: 27px;
+    font-weight: bold;
+}
+
+.primary {
+    color: white;
+    background: #7770cb;
+}
+
+.green {
+    color: #227858;
+    background: #d6f6e6;
+}
+
+.yellow {
+    color: #876222;
+    background: #ffe6a2;
+}
+
+.blue {
+    color: #376da3;
+    background: #dceeff;
+}
+
+.pink {
+    color: #a54a69;
+    background: #ffe1ec;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.sound-icon {
+    font-size: 65px;
+    margin: 15px auto 8px;
+}
+
+#phonicsSound {
+    color: #ea6275;
+    font-weight: bold;
+    font-size: 82px;
+    margin: 5px;
+}
+
+#soundCue {
+    font-size: 17px;
+    color: #68738b;
+    margin: 10px;
+}
+
+.chant {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 22px 0;
+}
+
+.chant-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 75px;
+    min-height: 78px;
+    padding: 12px;
+    border-radius: 20px;
+    background: #f1edff;
+    color: #6655b5;
+    font-weight: bold;
+    font-size: 31px;
+    transition: .2s;
+}
+
+.chant-item.active {
+    background: #ffe290;
+    color: #815721;
+    transform: scale(1.12);
+    box-shadow: 0 4px 15px #f3c96b66;
+}
+
+#instruction {
+    background: #f3f5fc;
+    border-radius: 15px;
+    padding: 15px;
+    line-height: 1.7;
+    min-height: 80px;
+}
+
+.status {
+    min-height: 28px;
+    margin-top: 16px;
+    font-weight: bold;
+    color: #6555b5;
+    line-height: 1.6;
+}
+
+.status.error {
+    color: #b34b4b;
+}
+
+.word-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 18px;
+    margin-top: 20px;
+}
+
+.word-card {
+    border: 3px solid transparent;
+    border-radius: 24px;
+    padding: 24px 8px;
+    background: #f5f3ff;
+    transition: .2s;
+}
+
+.word-card:nth-child(2) {
+    background: #fff4d9;
+}
+
+.word-card:nth-child(3) {
+    background: #e4f7ee;
+}
+
+.word-card.active {
+    border-color: #7770cb;
+    transform: scale(1.025);
+}
+
+.word-picture {
+    font-size: 82px;
+}
+
+.word-name {
+    font-size: 33px;
+    font-weight: bold;
+    margin: 12px 0;
+}
+
+.word-meaning {
+    font-size: 15px;
+    color: #68738b;
+}
+
+.highlight {
+    color: #e85d73;
+}
+
+.word-card button {
+    background: white;
+    margin-top: 15px;
+}
+
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.settings {
+    background: #ffffffbb;
+    border-radius: 20px;
+    padding: 20px;
+    margin: 25px 0;
+    line-height: 1.7;
+}
+
+.settings summary {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.small {
+    color: #737d92;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+select, input {
+    max-width: 100%;
+    margin: 8px 0;
+    padding: 8px;
+}
+
+a {
+    color: #6655b5;
+}
+
+#celebration {
+    position: fixed;
+    inset: 0;
+    background: #27243b77;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+}
+
+.celebration-card {
+    background: white;
+    padding: 40px;
+    border-radius: 30px;
+    text-align: center;
+    max-width: 90%;
+}
+
+@media(max-width:750px) {
+
+    .alphabet {
+        grid-template-columns: repeat(7,1fr);
+    }
+
+    .main-layout {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .word-grid {
+        gap: 6px;
+    }
+
+    .word-picture {
+        font-size: 45px;
+    }
+
+    .word-name {
+        font-size: 20px;
+    }
+
+    .panel {
+        padding: 20px 10px;
+    }
+
+    button {
+        font-size: 14px;
+        padding: 12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🌈 ABC Phonics Adventure</h1>
+
+    <div class="subtitle">
+        Look, Listen, and Say!
+        <br>
+        보고, 듣고, 신나게 따라 말해요!
+    </div>
+</header>
+
+<main class="container">
+
+    <div id="alphabet" class="alphabet"></div>
+
+    <div id="progressText">
+        ⭐ My Progress: 0 / 26
+    </div>
+
+    <div class="progress-track">
+        <div id="progressBar"></div>
+    </div>
+
+    <div class="main-layout">
+
+        <!-- STEP 1: ALPHABET SHAPE -->
+
+        <section class="panel">
+
+            <span class="step-label">STEP 1</span>
+
+            <h2>Look and Remember!</h2>
+
+            <div class="picture-box">
+                <div id="associationPicture"></div>
+            </div>
+
+            <div id="letterTitle"></div>
+
+            <div id="associationText"></div>
+
+            <div class="controls">
+
+                <button class="yellow"
+                        onclick="playLetterName()">
+                    🔊 Letter Name
+                </button>
+
+            </div>
+
+        </section>
+
+        <!-- STEP 2: PHONICS SOUND -->
+
+        <section class="panel">
+
+            <span class="step-label">STEP 2</span>
+
+            <h2>Listen and Repeat!</h2>
+
+            <div class="sound-icon">🎧</div>
+
+            <div id="phonicsSound"></div>
+
+            <div id="soundCue"></div>
+
+            <div class="chant">
+
+                <div id="chant0" class="chant-item"></div>
+
+                <div id="chant1" class="chant-item"></div>
+
+                <div id="chant2" class="chant-item"></div>
+
+            </div>
+
+            <div id="instruction"></div>
+
+            <div class="controls">
+
+                <button class="primary"
+                        onclick="playPhonics()">
+                    🔊 Phonics Sound
+                </button>
+
+                <button class="green"
+                        onclick="playChant()">
+                    🎵 Sound, Sound, Letter!
+                </button>
+
+                <button class="pink"
+                        onclick="stopEverything()">
+                    ■ Stop
+                </button>
+
+            </div>
+
+            <div id="status"
+                 class="status"
+                 aria-live="polite">
+                Ready? Let's go!
+            </div>
+
+        </section>
+
+    </div>
+
+    <!-- STEP 3: WORDS -->
+
+    <section class="panel">
+
+        <span class="step-label">STEP 3</span>
+
+        <h2>Say the Words!</h2>
+
+        <p>영어 단어를 듣고 따라 말해요.</p>
+
+        <div id="wordGrid" class="word-grid"></div>
+
+        <div class="controls">
+
+            <button class="primary"
+                    onclick="playAllWords(false)">
+                🔊 Listen to All
+            </button>
+
+            <button class="green"
+                    onclick="playAllWords(true)">
+                🗣 Listen and Repeat
+            </button>
+
+            <button class="yellow"
+                    onclick="playWholeLesson()">
+                ▶ Play Full Lesson
+            </button>
+
+        </div>
+
+        <div id="wordStatus"
+             class="status"
+             aria-live="polite"></div>
+
+    </section>
+
+    <div class="navigation">
+
+        <button class="blue"
+                onclick="moveLetter(-1)">
+            ◀ Previous
+        </button>
+
+        <button class="green"
+                onclick="completeLetter()">
+            ⭐ I Did It!
+        </button>
+
+        <button class="yellow"
+                onclick="moveLetter(1)">
+            Next ▶
+        </button>
+
+    </div>
+
+    <!-- TEACHER SETTINGS -->
+
+    <details class="settings">
+
+        <summary>
+            ⚙ Teacher Settings — 교사용 설정
+        </summary>
+
+        <p><strong>음성 설정</strong></p>
+
+        <p class="small">
+            파닉스 음소는 외부 MP3 녹음 음원을 사용합니다.
+            알파벳 이름과 단어만 브라우저 영어 음성을
+            사용합니다.
+        </p>
+
+        <label for="voiceSelect">
+            English Voice
+        </label>
+
+        <br>
+
+        <select id="voiceSelect"></select>
+
+        <p>
+            Word Speech Speed:
+            <span id="rateValue">0.85</span>
+        </p>
+
+        <input type="range"
+               id="speechRate"
+               min="0.65"
+               max="1.1"
+               step="0.05"
+               value="0.85"
+               oninput="updateRate()">
+
+        <p>
+            Repeat Time:
+            <span id="repeatValue">3</span> seconds
+        </p>
+
+        <input type="range"
+               id="repeatTime"
+               min="2"
+               max="6"
+               step="1"
+               value="3"
+               oninput="updateRepeatTime()">
+
+        <hr>
+
+        <p><strong>개별 음원 직접 등록</strong></p>
+
+        <p class="small">
+            미국식 파닉스 등 다른 발음으로 변경하고 싶으면
+            현재 알파벳에 해당하는 MP3 또는 WAV를
+            등록할 수 있습니다.
+            직접 등록한 음원은 기본 음원보다 우선합니다.
+            등록 파일은 페이지를 새로 고치면 사라집니다.
+        </p>
+
+        <input id="audioUpload"
+               type="file"
+               accept="audio/*">
+
+        <button class="blue"
+                onclick="registerAudio()">
+            Register Audio
+        </button>
+
+        <button class="yellow"
+                onclick="removeCustomAudio()">
+            Restore Default
+        </button>
+
+        <div id="audioInfo" class="small"></div>
+
+        <hr>
+
+        <p><strong>음원 출처</strong></p>
+
+        <p class="small">
+            기본 파닉스 음원: Letter Sounds 프로젝트
+            (영국식 영어 녹음 음원).
+            인터넷 연결이 필요합니다.
+            Q는 /k/와 /w/, X는 /k/와 /s/를
+            연결하여 재생합니다.
+        </p>
+
+        <a href="https://github.com/minormending/learn-letters"
+           target="_blank"
+           rel="noopener noreferrer">
+            Phonics Audio Source
+        </a>
+
+        <p>
+            <a href="https://www.youtube.com/watch?v=ChqnN3cKzXQ&t=1s"
+               target="_blank"
+               rel="noopener noreferrer">
+                ▶ Reference Video
+            </a>
+        </p>
+
+        <button class="yellow"
+                onclick="resetProgress()">
+            Reset Progress
+        </button>
+
+    </details>
+
+</main>
+
+<div id="celebration">
+
+    <div class="celebration-card">
+
+        <div style="font-size:80px">
+            🌟🎉🌈
+        </div>
+
+        <h1>Wonderful!</h1>
+
+        <p id="celebrationText"></p>
+
+        <button class="primary"
+                onclick="closeCelebration()">
+            Keep Going!
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+/* =====================================
+   A-Z LEARNING DATA
+
+   letter : alphabet
+   ipa    : phonics sound
+   cue    : Korean pronunciation cue
+   audio  : recorded phoneme filenames
+===================================== */
+
+const lessons = [
+
+{
+    letter:"A",
+    ipa:"æ",
+    cue:"애",
+    audio:["a"],
+    shape:"꼬깔모자 A",
+    icon:"🎉",
+    path:"M40 190 L110 25 L180 190 M72 115 L148 115",
+    tip:"입을 옆으로 벌리고 턱을 내려요. apple의 첫소리를 들어요.",
+    words:[
+        ["apple","🍎","사과"],
+        ["ant","🐜","개미"],
+        ["ax","🪓","도끼"]
+    ]
+},
+
+{
+    letter:"B",
+    ipa:"b",
+    cue:"ㅂ",
+    audio:["b"],
+    shape:"볼록볼록 B",
+    icon:"⛄",
+    path:"M65 25 L65 195 M65 25 Q175 15 165 70 Q158 110 65 110 Q190 100 180 155 Q175 200 65 195",
+    tip:"두 입술을 붙였다가 떼면서 짧게 소리 내요. 모음을 덧붙이지 않아요.",
+    words:[
+        ["ball","⚽","공"],
+        ["bear","🐻","곰"],
+        ["banana","🍌","바나나"]
+    ]
+},
+
+{
+    letter:"C",
+    ipa:"k",
+    cue:"ㅋ",
+    audio:["c"],
+    shape:"꼬부랑이 C",
+    icon:"🌙",
+    path:"M175 45 C30 -25 10 238 175 175",
+    tip:"혀의 뒤쪽으로 공기를 막았다가 짧게 내보내요.",
+    words:[
+        ["cat","🐱","고양이"],
+        ["cup","☕","컵"],
+        ["car","🚗","자동차"]
+    ]
+},
+
+{
+    letter:"D",
+    ipa:"d",
+    cue:"ㄷ",
+    audio:["d"],
+    shape:"반달 모양 D",
+    icon:"🌓",
+    path:"M55 25 L55 195 Q210 190 190 100 Q180 25 55 25",
+    tip:"혀끝을 윗니 뒤에 댔다가 떼어요.",
+    words:[
+        ["dog","🐶","강아지"],
+        ["duck","🦆","오리"],
+        ["doll","🪆","인형"]
+    ]
+},
+
+{
+    letter:"E",
+    ipa:"ɛ",
+    cue:"에",
+    audio:["e"],
+    shape:"빗 모양 E",
+    icon:"🪮",
+    path:"M165 25 L60 25 L60 195 L165 195 M60 110 L145 110",
+    tip:"입을 편안하게 벌리고 egg의 짧은 첫소리를 내요.",
+    words:[
+        ["egg","🥚","달걀"],
+        ["elephant","🐘","코끼리"],
+        ["elf","🧝","요정"]
+    ]
+},
+
+{
+    letter:"F",
+    ipa:"f",
+    cue:"바람이 나오는 F",
+    audio:["f"],
+    shape:"깃발 F",
+    icon:"🚩",
+    path:"M60 195 L60 25 L175 25 M60 95 L145 95",
+    tip:"윗니를 아랫입술에 살짝 대고 바람을 내보내요.",
+    words:[
+        ["fish","🐟","물고기"],
+        ["frog","🐸","개구리"],
+        ["fan","🪭","부채"]
+    ]
+},
+
+{
+    letter:"G",
+    ipa:"ɡ",
+    cue:"ㄱ",
+    audio:["g"],
+    shape:"꼬리 달린 동그라미 G",
+    icon:"🌀",
+    path:"M175 45 C20 -30 10 230 175 175 L175 110 L115 110",
+    tip:"혀 뒤쪽을 입천장에 댔다가 떼며 목을 울려요.",
+    words:[
+        ["goat","🐐","염소"],
+        ["gift","🎁","선물"],
+        ["gum","🍬","껌"]
+    ]
+},
+
+{
+    letter:"H",
+    ipa:"h",
+    cue:"ㅎ",
+    audio:["h"],
+    shape:"사다리 H",
+    icon:"🪜",
+    path:"M55 25 L55 195 M165 25 L165 195 M55 110 L165 110",
+    tip:"입을 편하게 열고 바람을 내보내요.",
+    words:[
+        ["hat","🎩","모자"],
+        ["hen","🐔","암탉"],
+        ["house","🏠","집"]
+    ]
+},
+
+{
+    letter:"I",
+    ipa:"ɪ",
+    cue:"짧은 이",
+    audio:["i"],
+    shape:"막대기 I",
+    icon:"🪄",
+    path:"M70 25 L150 25 M110 25 L110 195 M70 195 L150 195",
+    tip:"입술을 너무 당기지 말고 insect의 첫소리를 짧게 내요.",
+    words:[
+        ["igloo","🧊","이글루"],
+        ["insect","🐞","곤충"],
+        ["ink","🖋️","잉크"]
+    ]
+},
+
+{
+    letter:"J",
+    ipa:"dʒ",
+    cue:"영어 J 소리",
+    audio:["j"],
+    shape:"낚싯바늘 J",
+    icon:"🎣",
+    path:"M85 25 L165 25 L165 145 Q160 220 55 170",
+    tip:"혀 앞부분으로 공기를 막았다가 마찰을 내며 소리 내요.",
+    words:[
+        ["jam","🍓","잼"],
+        ["jet","✈️","제트기"],
+        ["jug","🏺","물병"]
+    ]
+},
+
+{
+    letter:"K",
+    ipa:"k",
+    cue:"ㅋ",
+    audio:["c"],
+    shape:"발차기 K",
+    icon:"🦵",
+    path:"M60 25 L60 195 M170 25 L60 110 L175 195",
+    tip:"C와 같은 /k/ 소리를 내요.",
+    words:[
+        ["kite","🪁","연"],
+        ["key","🔑","열쇠"],
+        ["king","👑","왕"]
+    ]
+},
+
+{
+    letter:"L",
+    ipa:"l",
+    cue:"혀끝을 올리는 L",
+    audio:["l"],
+    shape:"장화 L",
+    icon:"👢",
+    path:"M60 25 L60 195 L175 195",
+    tip:"혀끝을 윗니 뒤에 대고 혀 옆으로 공기를 보내요.",
+    words:[
+        ["lion","🦁","사자"],
+        ["leaf","🍃","나뭇잎"],
+        ["leg","🦵","다리"]
+    ]
+},
+
+{
+    letter:"M",
+    ipa:"m",
+    cue:"ㅁ",
+    audio:["m"],
+    shape:"산 두 개 M",
+    icon:"⛰️",
+    path:"M30 195 L30 25 L110 135 L190 25 L190 195",
+    tip:"입술을 다물고 코와 목을 울려요.",
+    words:[
+        ["moon","🌙","달"],
+        ["milk","🥛","우유"],
+        ["monkey","🐒","원숭이"]
+    ]
+},
+
+{
+    letter:"N",
+    ipa:"n",
+    cue:"ㄴ",
+    audio:["n"],
+    shape:"미끄럼틀 N",
+    icon:"🛝",
+    path:"M45 195 L45 25 L175 195 L175 25",
+    tip:"혀끝을 윗니 뒤에 대고 코로 소리를 내요.",
+    words:[
+        ["nose","👃","코"],
+        ["nest","🪹","둥지"],
+        ["net","🥅","그물"]
+    ]
+},
+
+{
+    letter:"O",
+    ipa:"ɒ",
+    cue:"아에 가까운 영국식 단모음",
+    audio:["o"],
+    shape:"동그란 도넛 O",
+    icon:"🍩",
+    path:"M110 25 C0 25 0 195 110 195 C220 195 220 25 110 25",
+    tip:"octopus의 첫소리예요. 영국식은 입술을 약간 둥글게 해요.",
+    words:[
+        ["octopus","🐙","문어"],
+        ["ox","🐂","황소"],
+        ["otter","🦦","수달"]
+    ]
+},
+
+{
+    letter:"P",
+    ipa:"p",
+    cue:"ㅍ",
+    audio:["p"],
+    shape:"풍선 P",
+    icon:"🎈",
+    path:"M65 195 L65 25 Q195 10 180 75 Q170 125 65 115",
+    tip:"두 입술을 다물었다가 바람을 짧게 터뜨려요.",
+    words:[
+        ["pig","🐷","돼지"],
+        ["pen","🖊️","펜"],
+        ["pizza","🍕","피자"]
+    ]
+},
+
+{
+    letter:"Q",
+    ipa:"kw",
+    cue:"/k/ + /w/",
+    audio:["c","w"],
+    shape:"꼬리 달린 동그라미 Q",
+    icon:"🔎",
+    path:"M110 25 C0 25 0 190 110 190 C220 190 220 25 110 25 M135 145 L195 205",
+    tip:"Q는 보통 U와 함께 써요. /k/와 /w/를 이어 말해요.",
+    words:[
+        ["queen","👸","여왕"],
+        ["quilt","🛏️","누비이불"],
+        ["quack","🦆","꽥꽥"]
+    ]
+},
+
+{
+    letter:"R",
+    ipa:"ɹ",
+    cue:"영어 R 소리",
+    audio:["r"],
+    shape:"다리가 있는 R",
+    icon:"🏃",
+    path:"M60 195 L60 25 Q190 5 175 70 Q165 110 60 110 M100 110 L180 195",
+    tip:"혀가 입천장에 닿지 않게 하여 소리를 내요.",
+    words:[
+        ["rabbit","🐰","토끼"],
+        ["rain","🌧️","비"],
+        ["rose","🌹","장미"]
+    ]
+},
+
+{
+    letter:"S",
+    ipa:"s",
+    cue:"뱀처럼 내는 소리",
+    audio:["s"],
+    shape:"구불구불 뱀 S",
+    icon:"🐍",
+    path:"M175 45 C60 -25 10 80 105 110 C220 145 165 235 45 165",
+    tip:"이를 가까이하고 좁은 틈으로 바람을 내보내요.",
+    words:[
+        ["sun","☀️","태양"],
+        ["snake","🐍","뱀"],
+        ["sock","🧦","양말"]
+    ]
+},
+
+{
+    letter:"T",
+    ipa:"t",
+    cue:"ㅌ",
+    audio:["t"],
+    shape:"망치 T",
+    icon:"🔨",
+    path:"M35 25 L185 25 M110 25 L110 195",
+    tip:"혀끝을 윗니 뒤에 댔다가 바람과 함께 떼어요.",
+    words:[
+        ["tiger","🐯","호랑이"],
+        ["top","🌀","팽이"],
+        ["tent","⛺","텐트"]
+    ]
+},
+
+{
+    letter:"U",
+    ipa:"ʌ",
+    cue:"어",
+    audio:["u"],
+    shape:"컵 모양 U",
+    icon:"🥛",
+    path:"M40 25 L40 135 Q40 205 110 195 Q180 195 180 135 L180 25",
+    tip:"입과 턱에 힘을 빼고 umbrella의 첫소리를 짧게 내요.",
+    words:[
+        ["umbrella","☂️","우산"],
+        ["up","⬆️","위로"],
+        ["under","⬇️","아래에"]
+    ]
+},
+
+{
+    letter:"V",
+    ipa:"v",
+    cue:"목이 울리는 V",
+    audio:["v"],
+    shape:"브이 모양 V",
+    icon:"✌️",
+    path:"M30 25 L110 195 L190 25",
+    tip:"윗니를 아랫입술에 대고 목을 울려요.",
+    words:[
+        ["van","🚐","승합차"],
+        ["vest","🦺","조끼"],
+        ["violin","🎻","바이올린"]
+    ]
+},
+
+{
+    letter:"W",
+    ipa:"w",
+    cue:"입술을 둥글게",
+    audio:["w"],
+    shape:"물결 두 개 W",
+    icon:"🌊",
+    path:"M20 25 L65 195 L110 85 L155 195 L200 25",
+    tip:"입술을 둥글게 모았다가 다음 모음으로 이어 말해요.",
+    words:[
+        ["water","💧","물"],
+        ["wolf","🐺","늑대"],
+        ["web","🕸️","거미줄"]
+    ]
+},
+
+{
+    letter:"X",
+    ipa:"ks",
+    cue:"/k/ + /s/",
+    audio:["c","s"],
+    shape:"교차하는 막대 X",
+    icon:"❌",
+    path:"M40 25 L180 195 M180 25 L40 195",
+    tip:"두 소리를 이어 말해요. box의 마지막 소리를 들어요.",
+    words:[
+        ["box","📦","상자"],
+        ["fox","🦊","여우"],
+        ["six","6️⃣","숫자 6"]
+    ]
+},
+
+{
+    letter:"Y",
+    ipa:"j",
+    cue:"이에서 이어지는 소리",
+    audio:["y"],
+    shape:"새총 Y",
+    icon:"🌱",
+    path:"M30 25 L110 110 L190 25 M110 110 L110 195",
+    tip:"혀의 앞부분을 높이고 다음 모음으로 이어 말해요.",
+    words:[
+        ["yellow","🟡","노란색"],
+        ["yo-yo","🪀","요요"],
+        ["yak","🐂","야크"]
+    ]
+},
+
+{
+    letter:"Z",
+    ipa:"z",
+    cue:"목이 울리는 Z",
+    audio:["z"],
+    shape:"번개 Z",
+    icon:"⚡",
+    path:"M35 25 L185 25 L35 195 L185 195",
+    tip:"S와 비슷한 입 모양으로 목을 울리면서 말해요.",
+    words:[
+        ["zebra","🦓","얼룩말"],
+        ["zip","🤐","지퍼"],
+        ["zoo","🦁","동물원"]
+    ]
+}
+
+];
+
+
+/* =====================================
+   AUDIO SOURCE
+
+   Recorded phonemes.
+   No speech synthesis for phonics.
+===================================== */
+
+const AUDIO_BASE =
+    "https://raw.githubusercontent.com/minormending/learn-letters/main/audio/";
+
+
+/* =====================================
+   APPLICATION STATE
+===================================== */
+
+const $ = id => document.getElementById(id);
+
+let current = 0;
+let activityId = 0;
+let voices = [];
+let completed = new Set();
+
+let activeAudio = null;
+let audioFinish = null;
+let speechFinish = null;
+
+let context = null;
+
+let activeSources = [];
+let blendFinish = null;
+
+const customAudio = {};
+const decodedAudio = new Map();
+
+try {
+    completed = new Set(
+        JSON.parse(
+            localStorage.getItem("abcPhonicsProgress")
+            || "[]"
+        )
+    );
+} catch(e) {}
+
+const sleep = ms =>
+    new Promise(resolve => setTimeout(resolve,ms));
+
+function lesson(){
+    return lessons[current];
+}
+
+function valid(token){
+    return token === activityId;
+}
+
+function setStatus(message,error=false){
+
+    $("status").textContent = message;
+
+    $("status").classList.toggle(
+        "error",
+        error
+    );
+}
+
+function setWordStatus(message){
+
+    $("wordStatus").textContent = message;
+}
+
+function updateRate(){
+
+    $("rateValue").textContent =
+        $("speechRate").value;
+}
+
+function updateRepeatTime(){
+
+    $("repeatValue").textContent =
+        $("repeatTime").value;
+}
+
+function repeatDelay(){
+
+    return Number(
+        $("repeatTime").value
+    ) * 1000;
+}
+
+
+/* =====================================
+   STOP PLAYBACK
+===================================== */
+
+function clearHighlights(){
+
+    document.querySelectorAll(
+        ".chant-item,.word-card"
+    ).forEach(el=>{
+        el.classList.remove("active");
+    });
+}
+
+function stopPlayback(){
+
+    activityId++;
+
+    if(activeAudio){
+
+        activeAudio.pause();
+
+        try {
+            activeAudio.currentTime = 0;
+        } catch(e) {}
+    }
+
+    if(audioFinish){
+        audioFinish(false);
+    }
+
+    activeAudio = null;
+
+    if("speechSynthesis" in window){
+
+        speechSynthesis.cancel();
+    }
+
+    if(speechFinish){
+        speechFinish(false);
+    }
+
+    activeSources.forEach(source=>{
+        try {
+            source.stop();
+        } catch(e) {}
+    });
+
+    activeSources = [];
+
+    if(blendFinish){
+        blendFinish(false);
+    }
+
+    clearHighlights();
+
+    return activityId;
+}
+
+function stopEverything(){
+
+    stopPlayback();
+
+    setStatus("Ready? Let's go!");
+
+    setWordStatus("");
+}
+
+
+/* =====================================
+   ENGLISH VOICES
+
+   Used for letter names and words only.
+===================================== */
+
+function loadVoices(){
+
+    const select = $("voiceSelect");
+
+    select.innerHTML = "";
+
+    if(!("speechSynthesis" in window)){
+
+        select.innerHTML =
+            "<option>Speech unavailable</option>";
+
+        return;
+    }
+
+    voices = speechSynthesis.getVoices()
+        .filter(v=>v.lang.toLowerCase().startsWith("en"));
+
+    if(!voices.length){
+
+        select.innerHTML =
+            "<option value='-1'>Default English</option>";
+
+        return;
+    }
+
+    voices.forEach((voice,index)=>{
+
+        const option =
+            document.createElement("option");
+
+        option.value = index;
+
+        option.textContent =
+            voice.name + " (" + voice.lang + ")";
+
+        select.appendChild(option);
+    });
+
+    // Match the British phonics recordings.
+
+    const preferred =
+        voices.findIndex(v=>
+            v.lang === "en-GB" &&
+            /natural|google|sonia|libby/i.test(v.name)
+        );
+
+    const british =
+        voices.findIndex(v=>v.lang === "en-GB");
+
+    select.value =
+        preferred >= 0 ? preferred :
+        british >= 0 ? british : 0;
+}
+
+if("speechSynthesis" in window){
+
+    loadVoices();
+
+    speechSynthesis.onvoiceschanged =
+        loadVoices;
+}
+
+
+/* =====================================
+   LETTER NAMES AND WORDS
+===================================== */
+
+function speak(text,token){
+
+    return new Promise(resolve=>{
+
+        if(!valid(token)){
+            resolve(false);
+            return;
+        }
+
+        if(!("speechSynthesis" in window)){
+
+            setStatus(
+                "영어 음성합성을 지원하지 않는 브라우저예요.",
+                true
+            );
+
+            resolve(false);
+            return;
+        }
+
+        let finished = false;
+        let timeout;
+
+        function finish(ok){
+
+            if(finished) return;
+
+            finished = true;
+
+            clearTimeout(timeout);
+
+            if(speechFinish === finish){
+                speechFinish = null;
+            }
+
+            resolve(ok);
+        }
+
+        speechFinish = finish;
+
+        const utterance =
+            new SpeechSynthesisUtterance(text);
+
+        const voice =
+            voices[Number($("voiceSelect").value)];
+
+        utterance.lang =
+            voice ? voice.lang : "en-GB";
+
+        if(voice){
+            utterance.voice = voice;
+        }
+
+        utterance.rate =
+            Number($("speechRate").value);
+
+        utterance.pitch = 1;
+
+        utterance.volume = 1;
+
+        utterance.onend =
+            ()=>finish(true);
+
+        utterance.onerror = ()=>{
+
+            if(valid(token)){
+                setStatus("영어 음성 재생 실패",true);
+            }
+
+            finish(false);
+        };
+
+        timeout = setTimeout(()=>{
+
+            finish(false);
+
+            speechSynthesis.cancel();
+
+            if(valid(token)){
+                setStatus("영어 음성이 응답하지 않아요.",true);
+            }
+
+        },12000);
+
+        speechSynthesis.speak(utterance);
+
+    });
+}
+
+
+/* =====================================
+   RECORDED PHONEME PLAYBACK
+===================================== */
+
+function phonemeURL(name){
+
+    return AUDIO_BASE + name + ".mp3";
+}
+
+function playRecordedAudio(url,token){
+
+    return new Promise(resolve=>{
+
+        if(!valid(token)){
+
+            resolve(false);
+
+            return;
+        }
+
+        const audio = new Audio(url);
+
+        audio.preload = "auto";
+
+        audio.volume = 1;
+
+        activeAudio = audio;
+
+        let finished = false;
+        let timeout;
+
+        function finish(ok){
+
+            if(finished) return;
+
+            finished = true;
+
+            clearTimeout(timeout);
+
+            if(!ok){
+                audio.pause();
+            }
+
+            audio.onended = null;
+            audio.onerror = null;
+
+            if(activeAudio === audio){
+                activeAudio = null;
+            }
+
+            if(audioFinish === finish){
+                audioFinish = null;
+            }
+
+            resolve(ok);
+        }
+
+        audioFinish = finish;
+
+        audio.onended =
+            ()=>finish(true);
+
+        audio.onerror = ()=>{
+
+            if(valid(token)){
+
+                setStatus(
+                    "파닉스 음원을 불러오지 못했어요. 인터넷 연결 또는 교사용 음원 설정을 확인해 주세요.",
+                    true
+                );
+            }
+
+            finish(false);
+        };
+
+        timeout = setTimeout(()=>{
+
+            if(valid(token)){
+
+                setStatus(
+                    "파닉스 음원 연결 시간이 초과됐어요.",
+                    true
+                );
+            }
+
+            finish(false);
+
+        },15000);
+
+        audio.play().catch(()=>{
+
+            if(valid(token)){
+
+                setStatus(
+                    "파닉스 MP3 재생에 실패했어요. 다시 눌러 주세요.",
+                    true
+                );
+            }
+
+            finish(false);
+        });
+    });
+}
+
+
+/* =====================================
+   BLEND Q AND X
+
+   Recorded /k/ + /w/
+   Recorded /k/ + /s/
+
+   No extra vowel or synthesized sound.
+===================================== */
+
+function getAudioContext(){
+
+    if(!context){
+
+        const AudioContextClass =
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+        if(!AudioContextClass){
+            throw new Error("Web Audio unavailable");
+        }
+
+        context = new AudioContextClass();
+    }
+
+    return context;
+}
+
+function unlockAudio(){
+
+    try {
+
+        const ctx = getAudioContext();
+
+        if(ctx.state === "suspended"){
+
+            ctx.resume().catch(()=>{});
+        }
+
+    } catch(e) {}
+}
+
+async function getBuffer(url){
+
+    if(decodedAudio.has(url)){
+
+        return decodedAudio.get(url);
+    }
+
+    const ctx = getAudioContext();
+
+    const controller = new AbortController();
+
+    const timeout = setTimeout(
+        ()=>controller.abort(),
+        10000
+    );
+
+    try {
+
+        const response = await fetch(
+            url,
+            {signal:controller.signal}
+        );
+
+        if(!response.ok){
+            throw new Error("Audio fetch failed");
+        }
+
+        const bytes =
+            await response.arrayBuffer();
+
+        const buffer =
+            await ctx.decodeAudioData(bytes);
+
+        decodedAudio.set(url,buffer);
+
+        return buffer;
+
+    } finally {
+
+        clearTimeout(timeout);
+    }
+}
+
+function findSoundRegion(buffer){
+
+    const samples = buffer.getChannelData(0);
+
+    let peak = 0;
+
+    for(let i=0;i<samples.length;i++){
+
+        peak = Math.max(
+            peak,
+            Math.abs(samples[i])
+        );
+    }
+
+    if(peak === 0){
+
+        return {
+            start:0,
+            duration:buffer.duration
+        };
+    }
+
+    const threshold = Math.max(
+        peak * .012,
+        .0005
+    );
+
+    let start = 0;
+    let end = samples.length - 1;
+
+    while(
+        start < end &&
+        Math.abs(samples[start]) < threshold
+    ){
+        start++;
+    }
+
+    while(
+        end > start &&
+        Math.abs(samples[end]) < threshold
+    ){
+        end--;
+    }
+
+    const padding =
+        Math.floor(buffer.sampleRate * .015);
+
+    start = Math.max(0,start-padding);
+
+    end = Math.min(
+        samples.length-1,
+        end+padding
+    );
+
+    return {
+
+        start:start / buffer.sampleRate,
+
+        duration:
+            (end-start+1) / buffer.sampleRate
+    };
+}
+
+async function playBlendedSounds(names,token){
+
+    try {
+
+        const ctx = getAudioContext();
+
+        await ctx.resume();
+
+        const buffers = await Promise.all(
+            names.map(name=>
+                getBuffer(phonemeURL(name))
+            )
+        );
+
+        if(!valid(token)) return false;
+
+        return await new Promise(resolve=>{
+
+            let finished = false;
+
+            let time = ctx.currentTime + .04;
+
+            function finish(ok){
+
+                if(finished) return;
+
+                finished = true;
+
+                if(blendFinish === finish){
+                    blendFinish = null;
+                }
+
+                activeSources = [];
+
+                resolve(ok);
+            }
+
+            blendFinish = finish;
+
+            buffers.forEach((buffer,index)=>{
+
+                const region =
+                    findSoundRegion(buffer);
+
+                const source =
+                    ctx.createBufferSource();
+
+                source.buffer = buffer;
+
+                source.connect(ctx.destination);
+
+                activeSources.push(source);
+
+                if(index === buffers.length-1){
+
+                    source.onended = ()=>{
+                        finish(valid(token));
+                    };
+                }
+
+                source.start(
+                    time,
+                    region.start,
+                    region.duration
+                );
+
+                time += region.duration;
+            });
+        });
+
+    } catch(e){
+
+        if(valid(token)){
+
+            setStatus(
+                "결합 음소를 재생하지 못했어요. 교사용 설정에서 Q 또는 X 녹음 파일을 등록해 주세요.",
+                true
+            );
+        }
+
+        return false;
+    }
+}
+
+async function playOnePhoneme(token){
+
+    if(!valid(token)) return false;
+
+    const data = lesson();
+
+    if(customAudio[data.letter]){
+
+        return await playRecordedAudio(
+            customAudio[data.letter],
+            token
+        );
+    }
+
+    if(data.audio.length > 1){
+
+        return await playBlendedSounds(
+            data.audio,
+            token
+        );
+    }
+
+    return await playRecordedAudio(
+        phonemeURL(data.audio[0]),
+        token
+    );
+}
+
+
+/* =====================================
+   ASSOCIATION PICTURE
+===================================== */
+
+function drawAssociation(data){
+
+    const colors = [
+        "#ef8279",
+        "#8c7dd6",
+        "#58b4bf",
+        "#e9a44e",
+        "#6ebd92"
+    ];
+
+    const color =
+        colors[current % colors.length];
+
+    $("associationPicture").innerHTML = `
+
+        <svg viewBox="0 0 340 240"
+             xmlns="http://www.w3.org/2000/svg">
+
+            <circle cx="32" cy="35" r="10"
+                    fill="#f7d785"/>
+
+            <circle cx="302" cy="32" r="8"
+                    fill="#b9e5cb"/>
+
+            <circle cx="290" cy="204" r="12"
+                    fill="#e3c9f8"/>
+
+            <g transform="translate(8,10)">
+
+                <path d="${data.path}"
+                      fill="none"
+                      stroke="${color}"
+                      stroke-width="21"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"/>
+
+            </g>
+
+            <text x="267"
+                  y="132"
+                  text-anchor="middle"
+                  dominant-baseline="middle"
+                  font-size="76">
+                ${data.icon}
+            </text>
+
+            <path d="M225 171 Q265 188 307 171"
+                  fill="none"
+                  stroke="#d5b98b"
+                  stroke-width="2"
+                  stroke-dasharray="5 6"/>
+
+        </svg>
+    `;
+}
+
+
+/* =====================================
+   RENDER ALPHABET
+===================================== */
+
+function renderAlphabet(){
+
+    const area = $("alphabet");
+
+    area.innerHTML = "";
+
+    lessons.forEach((data,index)=>{
+
+        const button =
+            document.createElement("button");
+
+        button.className = "letter-button";
+
+        button.textContent = data.letter;
+
+        if(index === current){
+
+            button.classList.add("selected");
+
+            button.setAttribute(
+                "aria-current","true"
+            );
+        }
+
+        if(completed.has(data.letter)){
+
+            button.classList.add("done");
+        }
+
+        button.onclick = ()=>{
+
+            stopPlayback();
+
+            current = index;
+
+            render();
+        };
+
+        area.appendChild(button);
+    });
+}
+
+
+/* =====================================
+   RENDER WORDS
+===================================== */
+
+function highlightWord(word,letter){
+
+    const target = letter.toLowerCase();
+
+    const index =
+        word.toLowerCase().indexOf(target);
+
+    if(index === -1) return word;
+
+    const length =
+        letter === "Q" &&
+        word.slice(index,index+2)
+            .toLowerCase() === "qu"
+        ? 2 : 1;
+
+    return word.slice(0,index) +
+
+        '<span class="highlight">' +
+
+        word.slice(index,index+length) +
+
+        '</span>' +
+
+        word.slice(index+length);
+}
+
+function renderWords(){
+
+    $("wordGrid").innerHTML = "";
+
+    lesson().words.forEach((word,index)=>{
+
+        const card =
+            document.createElement("article");
+
+        card.className = "word-card";
+
+        card.id = "wordCard" + index;
+
+        card.innerHTML = `
+
+            <div class="word-picture">
+                ${word[1]}
+            </div>
+
+            <div class="word-name">
+                ${highlightWord(word[0],lesson().letter)}
+            </div>
+
+            <div class="word-meaning">
+                ${word[2]}
+            </div>
+
+            <button aria-label="Listen to ${word[0]}">
+                🔊 Listen
+            </button>
+        `;
+
+        card.querySelector("button").onclick =
+            ()=>playWord(index);
+
+        card.querySelector(".word-picture").style.cursor =
+            "pointer";
+
+        card.querySelector(".word-picture").onclick =
+            ()=>playWord(index);
+
+        $("wordGrid").appendChild(card);
+    });
+}
+
+
+/* =====================================
+   RENDER CURRENT LESSON
+===================================== */
+
+function render(){
+
+    const data = lesson();
+
+    $("letterTitle").textContent =
+        data.letter + " " +
+        data.letter.toLowerCase();
+
+    $("associationText").textContent =
+        data.shape;
+
+    $("phonicsSound").textContent =
+        "/" + data.ipa + "/";
+
+    $("soundCue").textContent =
+        data.cue;
+
+    $("chant0").textContent =
+        "/" + data.ipa + "/";
+
+    $("chant1").textContent =
+        "/" + data.ipa + "/";
+
+    $("chant2").textContent =
+        data.letter;
+
+    $("instruction").textContent =
+        data.tip;
+
+    drawAssociation(data);
+
+    renderAlphabet();
+
+    renderWords();
+
+    updateProgress();
+
+    updateAudioInfo();
+
+    setStatus("Ready? Let's go!");
+
+    setWordStatus("");
+}
+
+
+/* =====================================
+   LETTER NAME ACTIVITY
+===================================== */
+
+async function playLetterName(){
+
+    const token = stopPlayback();
+
+    setStatus(
+        "Letter Name: " + lesson().letter
+    );
+
+    const ok = await speak(
+        lesson().letter,
+        token
+    );
+
+    if(ok && valid(token)){
+
+        setStatus("🗣 Your turn!");
+    }
+}
+
+
+/* =====================================
+   PHONICS ACTIVITY
+===================================== */
+
+async function playPhonics(){
+
+    const token = stopPlayback();
+
+    unlockAudio();
+
+    setStatus(
+        "🎧 Listen: /" + lesson().ipa + "/"
+    );
+
+    $("chant0").classList.add("active");
+
+    const ok =
+        await playOnePhoneme(token);
+
+    if(!valid(token)) return;
+
+    clearHighlights();
+
+    if(ok){
+
+        setStatus(
+            "🗣 Your turn! /" + lesson().ipa + "/"
+        );
+    }
+}
+
+
+/* =====================================
+   SOUND - SOUND - LETTER
+===================================== */
+
+async function chantInternal(token){
+
+    for(let i=0;i<2;i++){
+
+        if(!valid(token)) return false;
+
+        clearHighlights();
+
+        $("chant"+i).classList.add("active");
+
+        setStatus(
+            "🎧 Listen: /" + lesson().ipa + "/"
+        );
+
+        const ok =
+            await playOnePhoneme(token);
+
+        if(!ok || !valid(token)){
+
+            if(valid(token)) clearHighlights();
+
+            return false;
+        }
+
+        await sleep(450);
+    }
+
+    if(!valid(token)) return false;
+
+    clearHighlights();
+
+    $("chant2").classList.add("active");
+
+    setStatus(lesson().letter + "!");
+
+    const ok =
+        await speak(lesson().letter,token);
+
+    if(!ok || !valid(token)){
+
+        if(valid(token)) clearHighlights();
+
+        return false;
+    }
+
+    clearHighlights();
+
+    setStatus("🗣 Now you say it!");
+
+    await sleep(repeatDelay());
+
+    if(!valid(token)) return false;
+
+    setStatus("Great practice! ⭐");
+
+    return true;
+}
+
+async function playChant(){
+
+    const token = stopPlayback();
+
+    unlockAudio();
+
+    await chantInternal(token);
+}
+
+
+/* =====================================
+   WORD ACTIVITIES
+===================================== */
+
+async function wordInternal(
+    index,
+    token,
+    repeat
+){
+
+    if(!valid(token)) return false;
+
+    const word = lesson().words[index][0];
+
+    clearHighlights();
+
+    $("wordCard"+index)
+        .classList.add("active");
+
+    setWordStatus("🎧 Listen: " + word);
+
+    const ok =
+        await speak(word,token);
+
+    if(!ok || !valid(token)){
+
+        if(valid(token)) clearHighlights();
+
+        return false;
+    }
+
+    if(repeat){
+
+        setWordStatus(
+            "🗣 Your turn: " + word
+        );
+
+        await sleep(repeatDelay());
+
+    } else {
+
+        await sleep(500);
+    }
+
+    if(!valid(token)) return false;
+
+    clearHighlights();
+
+    return true;
+}
+
+async function playWord(index){
+
+    const token = stopPlayback();
+
+    const ok =
+        await wordInternal(index,token,true);
+
+    if(ok && valid(token)){
+
+        setWordStatus("Good job! ⭐");
+    }
+}
+
+async function allWordsInternal(
+    token,
+    repeat
+){
+
+    for(let i=0;i<3;i++){
+
+        if(!valid(token)) return false;
+
+        const ok = await wordInternal(
+            i,
+            token,
+            repeat
+        );
+
+        if(!ok) return false;
+    }
+
+    if(valid(token)){
+
+        setWordStatus(
+            "Wonderful! 🌟"
+        );
+
+        return true;
+    }
+
+    return false;
+}
+
+async function playAllWords(repeat){
+
+    const token = stopPlayback();
+
+    await allWordsInternal(
+        token,
+        repeat
+    );
+}
+
+
+/* =====================================
+   FULL LESSON
+
+   Letter name
+   Phonics sound twice
+   Letter name
+   Three words with repetition time
+===================================== */
+
+async function playWholeLesson(){
+
+    const token = stopPlayback();
+
+    unlockAudio();
+
+    setWordStatus("");
+
+    setStatus(
+        "Look! Letter " + lesson().letter
+    );
+
+    let ok = await speak(
+        lesson().letter,
+        token
+    );
+
+    if(!ok || !valid(token)) return;
+
+    await sleep(700);
+
+    ok = await chantInternal(token);
+
+    if(!ok || !valid(token)) return;
+
+    await sleep(500);
+
+    ok = await allWordsInternal(
+        token,
+        true
+    );
+
+    if(ok && valid(token)){
+
+        setStatus("Wonderful work! 🌈");
+
+        setWordStatus(
+            "You finished letter " +
+            lesson().letter + "!"
+        );
+    }
+}
+
+
+/* =====================================
+   CUSTOM AUDIO
+===================================== */
+
+function updateAudioInfo(){
+
+    const letter = lesson().letter;
+
+    if(customAudio[letter]){
+
+        $("audioInfo").textContent =
+            letter + ": 직접 등록한 음원 사용 중";
+
+    } else {
+
+        $("audioInfo").textContent =
+            letter + ": 외부 녹음 MP3 사용 중";
+    }
+}
+
+function registerAudio(){
+
+    const file =
+        $("audioUpload").files[0];
+
+    if(!file){
+
+        alert("먼저 음원 파일을 선택해 주세요.");
+
+        return;
+    }
+
+    stopPlayback();
+
+    const letter = lesson().letter;
+
+    if(customAudio[letter]){
+
+        URL.revokeObjectURL(
+            customAudio[letter]
+        );
+    }
+
+    customAudio[letter] =
+        URL.createObjectURL(file);
+
+    $("audioUpload").value = "";
+
+    updateAudioInfo();
+
+    setStatus(
+        letter + " 음원 등록 완료!"
+    );
+}
+
+function removeCustomAudio(){
+
+    stopPlayback();
+
+    const letter = lesson().letter;
+
+    if(customAudio[letter]){
+
+        URL.revokeObjectURL(
+            customAudio[letter]
+        );
+
+        delete customAudio[letter];
+    }
+
+    updateAudioInfo();
+
+    setStatus("기본 녹음 음원으로 변경했어요.");
+}
+
+
+/* =====================================
+   PROGRESS
+===================================== */
+
+function updateProgress(){
+
+    $("progressText").textContent =
+        "⭐ My Progress: " +
+        completed.size + " / 26";
+
+    $("progressBar").style.width =
+        (completed.size/26*100) + "%";
+}
+
+function moveLetter(direction){
+
+    stopPlayback();
+
+    current =
+        (current+direction+26)%26;
+
+    render();
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+}
+
+function completeLetter(){
+
+    stopPlayback();
+
+    completed.add(lesson().letter);
+
+    try {
+
+        localStorage.setItem(
+            "abcPhonicsProgress",
+            JSON.stringify([...completed])
+        );
+
+    } catch(e) {}
+
+    updateProgress();
+
+    renderAlphabet();
+
+    $("celebrationText").textContent =
+        completed.size === 26
+        ? "Amazing! You finished A to Z!"
+        : "You practiced letter " +
+          lesson().letter + "!";
+
+    $("celebration").style.display =
+        "flex";
+}
+
+function closeCelebration(){
+
+    $("celebration").style.display =
+        "none";
+
+    if(completed.size < 26){
+
+        moveLetter(1);
+    }
+}
+
+function resetProgress(){
+
+    if(!confirm("학습 기록을 초기화할까요?")){
+
+        return;
+    }
+
+    stopPlayback();
+
+    completed.clear();
+
+    try {
+
+        localStorage.removeItem(
+            "abcPhonicsProgress"
+        );
+
+    } catch(e) {}
+
+    current = 0;
+
+    render();
+}
+
+
+/* =====================================
+   KEYBOARD NAVIGATION
+===================================== */
+
+document.addEventListener(
+    "keydown",
+    event=>{
+
+        if(
+            ["INPUT","SELECT","TEXTAREA"]
+            .includes(event.target.tagName)
+        ){
+            return;
+        }
+
+        if(
+            $("celebration").style.display
+            === "flex"
+        ){
+            return;
+        }
+
+        if(event.key === "ArrowRight"){
+
+            moveLetter(1);
+        }
+
+        if(event.key === "ArrowLeft"){
+
+            moveLetter(-1);
+        }
+
+        if(event.key === "Escape"){
+
+            stopEverything();
+        }
+    }
+);
+
+render();
+
+</script>
+
+</body>
+</html>
